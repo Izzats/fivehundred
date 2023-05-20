@@ -1,0 +1,103 @@
+    {{>menu}}
+        {{>welcome}}
+
+<body>
+	<div class="container my-5" style="box-shadow: 0 0 15px 1px rgba(0, 0, 0, 0.4);">
+		<h2 class="text-center p-4">Su orden <span id="orderNumber"></span> está en proceso</h2>
+
+		<div class="col text-center">
+			<h4>Mucha gracias <span id="customerName"></span> por su preferencia!!! </h4>
+
+			<div class="card-body">
+				<table class="table table-sm">
+					<thead>
+
+					</thead>
+					<tbody>
+						{{!-- <tr>
+							<th scope="row"><strong>Número de orden:</strong></th>
+							<td><strong><span id="orderNumber2"></span></strong></td>
+						</tr> --}}
+						<tr>
+						<th scope="row"><strong>Descripcion de productos:</strong></th>
+							<td><span></span></td>
+						</tr>
+						<tr>
+						<th scope="row" id="productDescriptionHTML"></th>
+							<td id="productCostoHTML"></td>
+						</tr>
+						<tr>
+							<th scope="row"><strong>Total:</strong></th>
+							<td><strong><span id="productPrice"></span></strong></td>
+						</tr>
+						<tr>
+							<th scope="row"><strong>Información de envío:</strong></th>
+							<td><strong><span id="shippingInfo"></span></strong></td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+
+			<div id="datosTransf"></div>
+
+			<h5 class="p-4">Por favor, para completar su compra en efectivo, haga click en <a id="enlace"
+					href="https://api.whatsapp.com/send?phone=56956672536&text=%5B504Clean%5D%20Que%20tal%20vecino,%20soy%20Juan%20acabo%20de%20hacer%20mi%20pedido%20203344568%20por%20un%20total%20de%2054670%20en%20efectivo.%20Me%20gustar%C3%ADa%20%20agendar%20mi%20pedido">Whatsapp</a>
+				para agendar la entrega de su pedido, de lunes a viernes entre las 19 y 23 hrs.</h5>
+		</div>
+
+	</div>
+
+
+	<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+</body>
+
+<script>
+	document.getElementById("home").addEventListener("click", function() {
+  localStorage.clear();
+});
+const jsonPedido = JSON.parse(localStorage.getItem('pedido'));
+console.log(jsonPedido.linkW)
+const compraJson = jsonPedido.compraJson;
+		const productDescriptionHTML = document.getElementById("productDescriptionHTML");
+		const productCostoHTML = document.getElementById("productCostoHTML");
+				const datosTransfHTML = document.getElementById("datosTransf");
+		document.getElementById('orderNumber').textContent = jsonPedido.idPed;
+		document.getElementById('customerName').textContent = jsonPedido.nombre;
+		//document.getElementById('orderNumber2').textContent = jsonPedido.idPed;
+		document.getElementById('shippingInfo').textContent = `${jsonPedido.direccion}, ${jsonPedido.departamento}`;
+
+let productDescription = '';
+let productCosto = '';
+		let productPrice = 0;
+
+		for (const key in compraJson) {
+				if (compraJson.hasOwnProperty(key)) {
+				const product = compraJson[key];
+				productCost = product.precio * product.cantidad;
+				productDescription += `${product.nombre} (x${product.cantidad})<br>`;
+				productCosto += `${productCost}<br>`;
+				productPrice += product.precio * product.cantidad;
+			}
+		}
+
+//productDescription = productDescription.slice(0, -2); // Eliminar la última coma y espacio
+//document.getElementById('productDescription').textContent = productDescription;
+productDescriptionHTML.innerHTML = productDescription;
+productCostoHTML.innerHTML = productCosto;datosTransfHTML
+if(jsonPedido.efectivo == false){
+datosTransfHTML.innerHTML = `<strong>Puede hacer su depósito en:</strong><br>Cuenta Rut de Banco Estado <br> A nombre de: Rodolfo Stazzi<br> N° 15726570 <br> Mail rodolfostazzi@gmail.com`
+}
+//document.getElementById('productName').textContent = Object.keys(compraJson).join(', ');
+document.getElementById('productPrice').textContent = `$${productPrice}`;
+document.getElementById('enlace').href = jsonPedido.linkW;
+	// Actualizar el enlace de WhatsApp
+	//const whatsappLink = jsonPedido.linkW;
+	//document.querySelector('a[href^="https://api.whatsapp.com/send?phone="]').href = whatsappLink;
+//const linkElement = document.querySelector('h5 a');
+//linkElement.href = jsonPedido.linkW;
+
+
+</script>

@@ -1,0 +1,9 @@
+  <div id="{{ products.id }}" class="card product-card">
+    <img class="card-img-top img-opacity" src={{ products.urlimg }} alt="">
+    <div class="card-body text-center">
+      <h5 class="card-title">{{ products.nombre }}</h5>
+      <p class="card-title">${{ products.precio }}</p>
+    </div>
+    <input type="hidden" value=${{ products.precio_costo }} name="precio_costo" id="precio_costo">
+    <input type="hidden" value=${{ products.existencias }} name="existencias" id="existencias">
+  </div>

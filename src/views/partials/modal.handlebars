@@ -1,0 +1,316 @@
+<div class="modal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Mi Carrito</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div id="items-modal" class="container row justify-content-center">
+          <table class="table">
+            <thead>
+              <tr>
+                <th scope="col">#</th>
+                <th scope="col">Producto</th>
+                <th scope="col">Cantidad</th>
+                <th scope="col">Acción</th>
+                <th scope="col">Total</th>
+              </tr>
+            </thead>
+            <tbody id="items"></tbody>
+            <tfoot>
+              <tr id="footer">
+                <th scope="row" colspan="5">Carrito vacío - comience a comprar!</th>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id='mDatDes' type="button" onclick="mostrarDatosDespacho()"
+          class="btn btn-outline-primary mt-3 mb-3 ms-auto me-2">Datos Despacho</button>
+        {{!-- <button id="btnDatos" type="button" class="btn btn-outline-primary">Datos de Despacho</button>
+        <button id="clearitems" type="button" class="btn btn-outline-danger">Borrar Carro</button> --}}
+        <form class="d-none" id="datosDespacho">
+          <div class="form-group row">
+            <div class="col">
+              <label>Nombre</label>
+              <input name="nombre" class="form-control" />
+            </div>
+            <div class="col">
+              <label>Dirección</label>
+              <input name="direccion" class="form-control" disabled="disabled"
+                value="Gran Av. José Miguel Carrera 4310, San Miguel" />
+            </div>
+          </div>
+          <div class="form-group row">
+            <div class="col">
+              <label>Departamento</label>
+              <input name="departamento" class="form-control" />
+            </div>
+            <div class="col">
+              <label>Celular/Whatsapp</label>
+              <input name="celular" type="tel" class="form-control" />
+            </div>
+          </div>
+          <div class="form-group row">
+            <div class="col">
+              <label>Mail</label>
+              <input name="mail" type="email" class="form-control" />
+            </div>
+          </div>
+          <div class="form-group row">
+            <label>Forma de pago</label>
+            <div class="col">
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" onclick="mostrarCamposBanco()" name="pago-transaccion"
+                  id="pago-transaccion">
+                <label class="form-check-label" for="pago-transaccion">
+                  Pago por Transferencia
+                </label>
+              </div>
+            </div>
+            <div class="col">
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" onclick="mostrarPagoEfectivo()" name="pago-efectivo"
+                  id="pago-efectivo">
+                <label class="form-check-label" for="pago-efectivo">
+                  Pago en Efectivo
+                </label>
+              </div>
+            </div>
+          </div>
+
+
+          <div class="form-group row d-none" id="campos-banco">
+            {{!-- <label class="col-sm-2 col-form-label">Cuenta de banco</label> --}}
+            <div class="col-sm-10">
+              <p>Cuenta Rut de Banco Estado <br>
+                A nombre de: Rodolfo Stazzi<br>
+                N° 15726570<br>
+                Mail rodolfostazzi@gmail.com</p>
+            </div>
+          </div>
+
+          <div class="form-group row d-none" id="campos-efectivo">
+            <label class="col-sm-2 col-form-label">Monto de pago</label>
+            <div class="col-sm-10">
+              <input type="number" class="form-control" name="monto-pago" id="monto-pago" step="0.01">
+            </div>
+          </div>
+
+          <div class="form-group row d-none" id="campos-cambio">
+            <label class="col-sm-2 col-form-label">Cambio</label>
+            <div class="col-sm-10">
+              <input type="text" class="form-control" name="cambio" id="cambio" readonly>
+            </div>
+          </div>
+
+          <button type="submit" id="comprar" class="btn btn-outline-success mt-3 mb-3 ms-auto me-2">Comprar</button>
+          <button id="clearitems" type="button" class="btn btn-outline-danger mt-3 mb-3 ms-auto me-2">Borrar
+            Carro</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<template id="template-footer">
+  <th scope="row" colspan="2">Total productos</th>
+  <td>10</td>
+  <td>
+    {{!-- <button class="btn btn-outline-danger btn-sm" id="vaciar-carrito">
+      vaciar todo
+    </button> --}}
+  </td>
+  <td class="font-weight-bold">$ <span>5000</span></td>
+</template>
+
+<template id="template-carrito">
+  <tr>
+    <th scope="row">id</th>
+    <td></td>
+    <td></td>
+    <td>
+      <button class="btn btn-success btn-sm sumaResta">
+        +
+      </button>
+      <button class="btn btn-outline-success btn-sm sumaResta">
+        -
+      </button>
+    </td>
+    <td>$ <span>500</span></td>
+  </tr>
+</template>
+
+<script>
+  const mostrarDatosDespacho = () => {
+    datosDespacho.classList.remove("d-none");
+    let compra = { carrito };
+    for (let key in compra.carrito) {
+      // Multiplicamos el precio por la cantidad y lo sumamos al total
+      total += compra.carrito[key].precio * compra.carrito[key].cantidad;
+    }
+
+  }
+
+  let total = 0;
+  const datosDespacho = document.getElementById("datosDespacho");
+  let transferencia;
+  let efectivo;
+  let costo = 0;
+  let cambio = 0;
+
+
+
+
+  document.querySelector('#comprar').addEventListener('click', (e) => {
+    e.preventDefault()
+
+    let nom = datosDespacho.nombre.value;
+    let dir = datosDespacho.direccion.value;
+    let dep = datosDespacho.departamento.value;
+    let cel = datosDespacho.celular.value;
+    let emai = datosDespacho.mail.value;
+    let pTran = datosDespacho['pago-transaccion']['value'];
+    let pEfe = datosDespacho['pago-efectivo']['value'];
+    let mPag = datosDespacho['monto-pago']['value'];
+    console.log(efectivo)
+    console.log(transferencia)
+    let wspMessage = '';
+    let fecha = new Date();
+  let codigo = codigoFecha(fecha);
+  let fechaHora = fechaCompleta(fecha);
+  function codigoFecha(fecha) {
+    let dia = fecha.getDate().toString().padStart(2, '0');
+    let mes = (fecha.getMonth() + 1).toString().padStart(2, '0');
+    let anio = fecha.getFullYear().toString();
+    let hora = fecha.getHours().toString().padStart(2, '0');
+    let minutos = fecha.getMinutes().toString().padStart(2, '0');
+    let segundos = fecha.getSeconds().toString().padStart(2, '0');
+    return `${anio}${mes}${dia}${hora}${minutos}${segundos}`;
+  }
+  function fechaCompleta(fecha) {
+    let dia = fecha.getDate().toString().padStart(2, '0');
+    let mes = (fecha.getMonth() + 1).toString().padStart(2, '0');
+    let anio = fecha.getFullYear().toString();
+    let hora = fecha.getHours().toString().padStart(2, '0');
+    let minutos = fecha.getMinutes().toString().padStart(2, '0');
+    let segundos = fecha.getSeconds().toString().padStart(2, '0');
+    return `${anio}-${mes}-${dia} ${hora}:${minutos}:${segundos}`;
+  }
+
+
+    if (!nom || !dir || !dep || !cel || !emai) {
+      alert("Por favor complete todos los campos.");
+      return false;
+    }
+
+    if (!pTran && !pEfe) {
+      alert("Por favor seleccione una forma de pago.");
+      return false;
+    }
+
+    if (efectivo && (!mPag || mPag <= 0)) {
+      alert("Por favor ingrese un monto de pago válido.");
+      return false;
+    }
+
+    if (datosDespacho.cambio.value < 0) {
+      alert("Su pago está incompleto")
+    } else {
+      // Definimos el objeto compra
+      let compra = { carrito };
+      // Recorremos el objeto compra con un bucle for
+      for (let key in compra.carrito) {
+        // Multiplicamos el precio por la cantidad y lo sumamos al total
+        costo += compra.carrito[key].precio_costo * compra.carrito[key].cantidad;
+      }
+
+      if(efectivo == false){
+        wspMessage = `https://api.whatsapp.com/send?phone=56956672536&text=%5B504Clean%5D%20Que%20tal%20vecino,%20soy%20${datosDespacho.nombre.value}%20acabo%20de%20hacer%20mi%20pedido%20${codigo}%20por%20un%20total%20de%20${total}%20mediante%20transferencia.%20Adjunto%20el%20comprobante%20de%20transferencia.%20Me%20gustar%C3%ADa%20%20agendar%20mi%20pedido`;
+      }else{
+        wspMessage = `https://api.whatsapp.com/send?phone=56956672536&text=%5B504Clean%5D%20Que%20tal%20vecino,%20soy%20${datosDespacho.nombre.value}%20acabo%20de%20hacer%20mi%20pedido%20${codigo}%20por%20un%20total%20de%20${total}%20en%20efectivo.%20Me%20gustar%C3%ADa%20%20agendar%20mi%20pedido`;
+      }
+
+      if (efectivo == true) { cambio = parseInt(datosDespacho.cambio.value) }
+      const payload = {
+        nombre: datosDespacho.nombre.value,
+        direccion: datosDespacho.direccion.value,
+        departamento: datosDespacho.departamento.value,
+        celular: (datosDespacho.celular.value).replace(/[-\s+]/g, ''),
+        email: datosDespacho.mail.value,
+        compra: carrito,
+        total: total,
+        transferencia: transferencia,
+        efectivo: efectivo,
+        cambio: cambio,
+        diferencia: total - costo,
+        fechaPed: fechaHora,
+        idPed: codigo,
+        linkW: wspMessage
+      }
+      creaVen(payload)
+      console.log(payload)
+    }
+  })
+
+  const creaVen = async (payload) => {
+    try {
+      console.log(payload)
+      const response = await fetch('/creaVen', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      })
+
+      const jsonResponse = await response.json()
+     localStorage.setItem('pedido', jsonResponse)
+      window.location.href = `/thanks`
+
+
+    } catch (err) {
+      alert(`Ha ocurrido un error... ${err.message}`)
+    }
+  }
+
+  let campoBanco = document.getElementById("campos-banco");
+  let camposEfectivo = document.getElementById("campos-efectivo");
+  let camposCambio = document.getElementById("campos-cambio");
+
+  // Agregar la clase d-none
+  const mostrarCamposBanco = () => {
+    campoBanco.classList.remove("d-none");
+    transferencia = true;
+    efectivo = false;
+  }
+
+  const mostrarPagoEfectivo = () => {
+    camposEfectivo.classList.remove("d-none");
+    camposCambio.classList.remove("d-none");
+    transferencia = false;
+    efectivo = true;
+  }
+
+
+
+
+  // Obtener los elementos HTML
+  let montoPagoInput = document.getElementById("monto-pago");
+  let cambioInput = document.getElementById("cambio");
+
+  // Definir la función que se ejecutará cuando se modifique el valor de monto-pago
+  function calcularCambio() {
+    let montoPago = parseFloat(montoPagoInput.value);
+    let cambio = montoPago - total;
+    cambioInput.value = cambio.toFixed(2);
+  }
+
+
+  // Asignar la función al evento "input" de monto-pago
+  montoPagoInput.addEventListener("input", calcularCambio);
+
+
+</script>
